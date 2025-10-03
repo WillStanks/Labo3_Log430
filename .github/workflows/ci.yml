@@ -42,6 +42,9 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      - name: Créer le réseau labo03-network si besoin
+        run: docker network create labo03-network || true
+
       - name: Démarrer BD
         run: |
           docker compose up -d mysql redis --wait
