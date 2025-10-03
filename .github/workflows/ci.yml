@@ -55,22 +55,22 @@ jobs:
           python -m pytest
     
   deploy:
-  runs-on: self-hosted
-  needs: tests
-  if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: self-hosted
+    needs: tests
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
 
-  steps:
-    - name: Nettoyer le workspace
-      run: |
-        sudo rm -rf ${{ github.workspace }}/* || true
-        sudo rm -rf ${{ github.workspace }}/.* || true
-      continue-on-error: true
+    steps:
+      - name: Nettoyer le workspace
+        run: |
+          sudo rm -rf ${{ github.workspace }}/* || true
+          sudo rm -rf ${{ github.workspace }}/.* || true
+        continue-on-error: true
 
-    - name: Checkout dépot
-      uses: actions/checkout@v4
+      - name: Checkout dépot
+        uses: actions/checkout@v4
 
-    - name: Déploiement Docker
-      run: docker compose --profile full up -d --build --remove-orphans --wait
+      - name: Déploiement Docker
+        run: docker compose --profile full up -d --build --remove-orphans --wait
 
 
     
