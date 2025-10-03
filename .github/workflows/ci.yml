@@ -47,9 +47,6 @@ jobs:
           docker ps -q --filter "ancestor=mysql:8" | xargs -r docker stop
           docker ps -q --filter "ancestor=redis:7" | xargs -r docker stop
 
-      - name: Créer le réseau labo03-network si besoin
-        run: docker network create labo03-network || true
-
       - name: Creer fichier .env
         run: |
           echo "DB_HOST=localhost" >> .env
@@ -60,6 +57,9 @@ jobs:
           echo "REDIS_HOST=localhost" >> .env
           echo "REDIS_PORT=6379" >> .env
           echo "REDIS_DB=0" >> .env
+
+      - name: Créer le réseau labo03-network si besoin
+        run: docker network create labo03-network || true
 
       - name: Démarrer BD
         run: |
