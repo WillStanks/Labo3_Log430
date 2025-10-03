@@ -42,8 +42,14 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+
+      - name: Stop existing MySQL and Redis containers
+        run: |
+          docker ps -q --filter "ancestor=mysql:8" | xargs -r docker stop
+          docker ps -q --filter "ancestor=redis:7" | xargs -r docker stop
+
       - name: Créer le réseau labo03-network si besoin
-        run: docker network create labo03-network || true --wait
+        run: docker network create labo03-network || true
 
       - name: Démarrer BD
         run: |
