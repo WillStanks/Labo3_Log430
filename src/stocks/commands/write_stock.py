@@ -6,6 +6,7 @@ Auteurs : Gabriel C. Ullmann, Fabio Petrillo, 2025
 from sqlalchemy import text
 from stocks.models.stock import Stock
 from db import get_redis_conn, get_sqlalchemy_session
+from stocks.models.product import Product
 
 def set_stock_for_product(product_id, quantity):
     """Set stock quantity for product in MySQL"""
@@ -28,7 +29,17 @@ def set_stock_for_product(product_id, quantity):
             response_message = f"rows added: {new_stock.product_id}"
   
         r = get_redis_conn()
-        r.hset(f"stock:{product_id}", "quantity", quantity)
+
+        product = session.query(Product).filter(Product.id == product_id).first()
+        name = product.name if product else ''
+        sku = product.sku if product else ''
+        price = product.price if product else 0.0
+        r.hset(f"stock:{product_id}", mapping={
+            "quantity": quantity,
+            "name": name,
+            "sku": sku,
+            "price": price
+        })
         return response_message
     except Exception as e:
         session.rollback()
@@ -80,16 +91,29 @@ def update_stock_redis(order_items, operation):
             else:
                 product_id = item['product_id']
                 quantity = item['quantity']
-            # TODO: ajoutez plus d'information sur l'article
+
             current_stock = r.hget(f"stock:{product_id}", "quantity")
             current_stock = int(current_stock) if current_stock else 0
+
             
+            session = get_sqlalchemy_session()
+            product = session.query(Product).filter(Product.id == product_id).first()
+            name = product.name
+            sku = product.sku
+            price = product.price
+            session.close()
+
             if operation == '+':
                 new_quantity = current_stock + quantity
-            else:  
+            else:
                 new_quantity = current_stock - quantity
-            
-            pipeline.hset(f"stock:{product_id}", "quantity", new_quantity)
+
+            pipeline.hset(f"stock:{product_id}", mapping={
+                "quantity": new_quantity,
+                "name": name,
+                "sku": sku,
+                "price": price
+            })
         
         pipeline.execute()
     

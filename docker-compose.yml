@@ -13,6 +13,25 @@ services:
       - mysql
       - redis
 
+  tests:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app/src
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: labo03
+      DB_PASSWORD: labo03
+      DB_NAME: labo03_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    depends_on:
+      - mysql
+      - redis
+    command: python -m pytest
+
   mysql:
     image: mysql:8
     restart: unless-stopped
