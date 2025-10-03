@@ -43,7 +43,7 @@ jobs:
           pip install pytest
 
       - name: Créer le réseau labo03-network si besoin
-        run: docker network create labo03-network || true
+        run: docker network create labo03-network || true --wait
 
       - name: Démarrer BD
         run: |
